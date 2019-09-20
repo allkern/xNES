@@ -1,17 +1,20 @@
-#define read(addr) Bus->access(addr)
-#define write(addr, v) Bus->access(addr, v, false)
+#define rb(addr) Bus->access(addr)
+#define rw(addr) (Bus->access(addr+1)<<8)|(Bus->access(addr))
+#define wb(addr, v) Bus->access(addr, v, false)
 
-#define addrmode(name, memory_operand, fetch, cycles, len, fsign) addrmode_##memory_operand(name, fetch, cycles, len, fsign)
-#define addrmode_true(name, fetch, _cycles, len, fsign) \
+#define addrmode(name, memory_operand, fetch, cycles, len, fsign, opt_code) addrmode_##memory_operand(name, fetch, cycles, len, fsign, opt_code)
+#define addrmode_true(name, fetch, _cycles, len, fsign, opt_code) \
 	inline void __cdecl addrmode_##name(void) { \
 		uint_least16_t offset = ##fetch; \
 		this->##fsign = read(offset); \
+		##opt_code \
 		this->pc += len; \
 		this->cycles += _cycles; \
 	}
-#define addrmode_false(name, fetch, _cycles, len, fsign) \
+#define addrmode_false(name, fetch, _cycles, len, fsign, opt_code) \
 	inline void __cdecl addrmode_##name(void) { \
 		this->##fsign = fetch; \
+		##opt_code \
 		this->pc += len; \
 		this->cycles += _cycles; \
 	}
