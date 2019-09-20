@@ -29,9 +29,9 @@ class cpu {
 	addrmode(acc, false, this->a   								   , 0, 0, fetched,); // Accumulator
 	addrmode(imm, true , this->pc+1								   , 0, 1, fetched,); // Immediate
 	addrmode(zp0, true , this->pc+1								   , 0, 1, fetched,); // Zero Page
-	addrmode(abs, false, ((read(this->pc+2)<<8) | read(this->pc+1)), 0, 2, addr_abs,); // Absolute
-	addrmode(rel, false, read(this->pc+1)						   , 0, 1, addr_rel,); // Relative
-	addrmode(ind, true , ((read(this->pc+2)<<8) | read(this->pc+1)), 0, 2, fetched,); // Indirect
+	addrmode(abs, false, rw(this->pc+1):, 0, 2, addr_abs,); // Absolute
+	addrmode(rel, false, (int_least16_t)rb(this->pc+1), 0, 1, addr_rel,); // Relative
+	addrmode(ind, true , rw(this->pc+1), 0, 2, fetched,); // Indirect
 
 	// Instructions:
 	#define ld(r) this->##r = this->fetched
