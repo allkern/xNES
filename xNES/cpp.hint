@@ -1,0 +1,23 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define addrmode(name, memory_operand, fetch, cycles, len, fsign) addrmode_##memory_operand(name, fetch, cycles, len, fsign)
+#define addrmode_true(name, fetch, cycles, len, fsign) \
+	inline int __cdecl addrmode_##name(void) { \
+		uint_least16_t offset = ##fetch; \
+		this->##fsign = read(offset); \
+		this->pc += len; \
+		return cycles; \
+	}
+#define addrmode_false(name, fetch, cycles, len, fsign) \
+	inline int __cdecl addrmode_##name(void) { \
+		this->##fsign = fetch; \
+		this->pc += len; \
+		return cycles; \
+	}
+
+#define instruction(name, _addrmode_, code) \
+	inline void __cdecl ##name_##_addrmode_(void) { \
+		addrmode_##_addrmode_(); \
+		##code \
+	}
